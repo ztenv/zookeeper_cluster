@@ -33,6 +33,15 @@ namespace xc{
         typedef std::shared_ptr<IEventHandler> IEventHandlerPtr;
 
         /**
+         * @brief 结点的模式
+         */
+        enum class EN_NodeMode{
+            Leader=0,         //主结点
+            Follower=1,       //从结点
+            Other=2           //其他模式，初始、断线等
+        };
+
+        /**
          * @brief 集群管理器接口
          */
         class IClusterManager{
@@ -84,6 +93,13 @@ namespace xc{
              * @return 0:成功，非0:失败
              */
             virtual int DeInitialize()=0;
+
+            /**
+             * @brief 结点的工作模式
+             *
+             * @return EN_NodeMode
+             */
+            virtual EN_NodeMode getMode()=0;
         };
         typedef std::shared_ptr<IClusterManager> IClusterManagerPtr;
     }

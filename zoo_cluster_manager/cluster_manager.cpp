@@ -13,7 +13,8 @@ namespace xc{
     namespace common{
 
         namespace impl{
-            CClusterManager::CClusterManager():m_runState(EN_State::UnKnown),m_tag("xunce tech adc")
+            CClusterManager::CClusterManager():m_runState(EN_State::UnKnown),
+            m_nodeMode(EN_NodeMode::Other),m_tag("xunce tech adc")
             {
                 cout<<"CClusterManager ctor"<<endl;
             }
@@ -110,6 +111,7 @@ namespace xc{
                 {
                     pthis->onZOO_CHILD_EVENT(zk_handle,eventType,state,path);
                 }
+                cout<<pthis->m_node<<" node work mode:"<<(int)pthis->m_nodeMode<<endl;
             }
 
             void CClusterManager::onZOO_CHILD_EVENT( zhandle_t *zk_handle,int eventType,
@@ -124,7 +126,15 @@ namespace xc{
                         cout<<"path:"<<path<<" children changed:"<<endl;
                         if (pchild_nodes->count>0)
                         {
-                            this->triggerMasterEvent(m_node==pchild_nodes->data[0]);
+                            bool isMaster=(m_node==pchild_nodes->data[0]);
+                            if(isMaster)
+                            {
+                                m_nodeMode=EN_NodeMode::Leader;
+                            }else{
+                                m_nodeMode=EN_NodeMode::Follower;
+                            }
+
+                            this->triggerMasterEvent(isMaster);
                         }
                         for(int i=0;i<pchild_nodes->count;++i)
                         {

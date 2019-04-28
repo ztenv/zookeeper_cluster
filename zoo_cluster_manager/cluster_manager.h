@@ -63,8 +63,13 @@ namespace xc{
                 int Stop() override;
                 int DeInitialize() override;
 
+                EN_NodeMode getMode()override{
+                    return m_nodeMode;
+                }
+
             private:
                 std::atomic<EN_State> m_runState;
+                EN_NodeMode m_nodeMode;
 
                 zhandle_tPtr m_zkhandlePtr;
                 std::string m_hosts;
