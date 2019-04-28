@@ -69,13 +69,14 @@ namespace xc{
 
             private:
                 std::atomic<EN_State> m_runState;
-                EN_NodeMode m_nodeMode;
+                std::atomic<EN_NodeMode> m_nodeMode;
 
                 zhandle_tPtr m_zkhandlePtr;
                 std::string m_hosts;
                 std::string m_tag;
                 std::string m_path;
                 std::string m_node;
+                unsigned int m_timeout;
                 //std::map<int,std::string> m_errorInfo;
 
                 std::mutex m_ehMutex;
@@ -85,6 +86,7 @@ namespace xc{
                 void triggerMasterEvent(bool isMaster );
                 void onZOO_CHILD_EVENT(zhandle_t *zk_handle,int eventType,int state,
                                        const char *path);
+                void onZOO_SESSION_EVENT(zhandle_t *zk_handle,int eventType,int state);
 
                 const char *errorCode2String(int ec);
                 int createNode(const std::string &path,const std::string &nodeName);

@@ -30,13 +30,14 @@ namespace xc{
             {
                 int res=0;
                 do{
+                    cout<<"1"<<(int)m_runState.load()<<endl;
                     if(m_runState==EN_State::Initialized||m_runState==EN_State::Running||
                        m_runState==EN_State::Started)
                     {//bug is here
                         break;
                     }
 
-                    if((hosts.length()==0)||(path.length()==0)||(m_zkhandlePtr.get()!=nullptr))
+                    if((hosts.length()==0)||(path.length()==0))
                     {
                         res=-1;
                         break;
@@ -45,6 +46,7 @@ namespace xc{
                     m_hosts=hosts;
                     m_path=path;
                     m_node=node;
+                    m_timeout=timeout;
 
                     zhandle_t *zk_handle=zookeeper_init(hosts.c_str(),CClusterManager::watcher,
                                                         timeout,(clientid_t*)NULL,(void*)this,0);
@@ -107,11 +109,33 @@ namespace xc{
                     <<"event:"<<eventType<<" state:"<<state<<" path:"<<path<<endl;
 
                 CClusterManager* pthis=static_cast<CClusterManager*>(context);
-                if(eventType==ZOO_CHILD_EVENT)
+                if(pthis!=nullptr)
                 {
-                    pthis->onZOO_CHILD_EVENT(zk_handle,eventType,state,path);
+                    if(eventType==ZOO_SESSION_EVENT)
+                    {
+                        pthis->onZOO_SESSION_EVENT(zk_handle,eventType,state);
+                    }else if(eventType==ZOO_CHILD_EVENT)
+                    {
+                        pthis->onZOO_CHILD_EVENT(zk_handle,eventType,state,path);
+                    }
+                    cout<<pthis->m_node<<" node work mode:"<<(int)pthis->m_nodeMode.load()<<endl;
                 }
-                cout<<pthis->m_node<<" node work mode:"<<(int)pthis->m_nodeMode<<endl;
+            }
+
+            void CClusterManager::onZOO_SESSION_EVENT(zhandle_t *zk_handle,int eventType,int state)
+            {
+                if(state==ZOO_EXPIRED_SESSION_STATE||state==ZOO_AUTH_FAILED_STATE||
+                   state==999)
+                {
+                    m_nodeMode=EN_NodeMode::Other;
+                }
+                if(state==ZOO_EXPIRED_SESSION_STATE)
+                {
+                    this->m_runState=EN_State::UnKnown;
+                    cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
+                    this->Initialize(m_hosts,m_path,m_node,m_timeout);
+                    this->Start();
+                }
             }
 
             void CClusterManager::onZOO_CHILD_EVENT( zhandle_t *zk_handle,int eventType,
