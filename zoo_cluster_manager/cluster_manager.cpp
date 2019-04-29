@@ -131,7 +131,7 @@ namespace xc{
                 if(state==ZOO_EXPIRED_SESSION_STATE)
                 {
                     this->m_runState=EN_State::UnKnown;
-                    cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
+                    //watcher_fn fn=zoo_set_watcher(zk_handle,&CClusterManager::watcher);
                     this->Initialize(m_hosts,m_path,m_node,m_timeout);
                     this->Start();
                 }
