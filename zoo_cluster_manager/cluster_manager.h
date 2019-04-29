@@ -77,19 +77,20 @@ namespace xc{
                 std::string m_path;
                 std::string m_node;
                 unsigned int m_timeout;
-                //std::map<int,std::string> m_errorInfo;
 
                 std::mutex m_ehMutex;
                 std::vector<common::IEventHandlerPtr> m_eventHandlers;
 
                 void clearEventHandlers();
                 void triggerMasterEvent(bool isMaster );
+
                 void onZOO_CHILD_EVENT(zhandle_t *zk_handle,int eventType,int state,
                                        const char *path);
                 void onZOO_SESSION_EVENT(zhandle_t *zk_handle,int eventType,int state);
 
-                const char *errorCode2String(int ec);
                 int createNode(const std::string &path,const std::string &nodeName);
+
+                const char *errorCode2String(int ec);
                 static void watcher(zhandle_t *zk_handle,int eventType,int state,
                                        const char *path,void *context);
             };

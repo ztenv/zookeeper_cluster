@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
     IEventHandlerPtr ehPtr=IEventHandlerPtr(new EventHandler());
 
     icmPtr->Initialize("192.168.0.227:2181,192.168.0.227:2182,192.168.0.227:2183",
-                       path,node,5000);
+                       path,node,100);
     icmPtr->Register(ehPtr);
     icmPtr->Start();
 

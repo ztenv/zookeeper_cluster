@@ -14,7 +14,7 @@ namespace xc{
 
         namespace impl{
             CClusterManager::CClusterManager():m_runState(EN_State::UnKnown),
-            m_nodeMode(EN_NodeMode::Other),m_tag("xunce tech adc")
+            m_nodeMode(EN_NodeMode::Other),m_tag("xunce tech adc"),m_timeout(10)
             {
                 cout<<"CClusterManager ctor"<<endl;
             }
@@ -30,7 +30,6 @@ namespace xc{
             {
                 int res=0;
                 do{
-                    cout<<"1"<<(int)m_runState.load()<<endl;
                     if(m_runState==EN_State::Initialized||m_runState==EN_State::Running||
                        m_runState==EN_State::Started)
                     {//bug is here
