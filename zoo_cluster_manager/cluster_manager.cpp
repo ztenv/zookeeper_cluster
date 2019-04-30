@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <exception>
+#include <thread>
 
 
 #include "StringHelper.h"
@@ -132,8 +133,18 @@ namespace xc{
                 {
                     this->m_runState=EN_State::UnKnown;
                     //watcher_fn fn=zoo_set_watcher(zk_handle,&CClusterManager::watcher);
-                    this->Initialize(m_hosts,m_path,m_node,m_timeout);
-                    this->Start();
+
+                    do{
+                        if(m_nodeMode!=EN_NodeMode::Other)
+                        {
+                            cout<<"reconnected"<<endl;
+                            break;
+                        }
+                        cout<<"reconnecting...["<<m_hosts<<"]:"<<m_node<<endl;
+                        this->Initialize(m_hosts,m_path,m_node,m_timeout);
+                        this->Start();
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                    }while(true);
                 }
             }
 
