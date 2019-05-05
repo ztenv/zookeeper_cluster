@@ -1,0 +1,5 @@
+main
+cluster_demo
+libcluster.so
+build/*
+test/build/*

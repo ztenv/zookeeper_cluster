@@ -1,9 +1,9 @@
-#include "cluster_manager.h"
+#include "cluster_interface.h"
 #include <iostream>
 #include <memory>
 
 using namespace std;
-using namespace xc::common;
+using namespace uvframe::baseutils;
 
 /**
  * @brief 主从变动通知事件
@@ -26,19 +26,22 @@ int main(int argc,char *argv[])
 {
     std::string path="/xunce/adc";
     std::string node="0000";
-    if(argc==3)
+    std::string hosts="192.168.0.223:2181,192.168.0.224:2181,192.168.0.225:2181";
+    if(argc==4)
     {
-        path=argv[1];
-        node=argv[2];
+        hosts=argv[1];
+        path=argv[2];
+        node=argv[3];
+    }else{
+        cout<<"usage:"<<argv[0]<<" zk_hosts path node"<<endl<<
+            "such as:"<<argv[0]<<" "<<hosts<<" "<<path<<" "<<node<<endl;
+        return 0;
     }
-    CClusterManagerPtr cmPtr=std::make_shared<impl::CClusterManager>();
-    IClusterManagerPtr icmPtr=cmPtr;
 
+    IClusterManagerPtr icmPtr=ClusterManagerFactory::create();
     IEventHandlerPtr ehPtr=IEventHandlerPtr(new EventHandler());
 
-    //icmPtr->Initialize("192.168.0.227:2181,192.168.0.227:2182,192.168.0.227:2183",
-    icmPtr->Initialize("192.168.0.223:2181,192.168.0.224:2181,192.168.0.225:2181",
-                       path,node,100);
+    icmPtr->Initialize(hosts,path,node,100);
     icmPtr->Register(ehPtr);
     icmPtr->Start();
 
