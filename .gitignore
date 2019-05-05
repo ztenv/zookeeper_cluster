@@ -2,3 +2,4 @@ main
 cluster_demo
 cluster_manager\build\*
 cluster_manager\test\build\*
+libcluster_t.so

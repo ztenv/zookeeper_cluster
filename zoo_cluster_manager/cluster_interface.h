@@ -36,9 +36,18 @@ namespace xc{
          * @brief 结点的模式
          */
         enum class EN_NodeMode{
-            Leader=0,         //主结点
-            Follower=1,       //从结点
-            Other=2           //其他模式，初始、断线等
+            /**
+             * @brief 主结点工作模式
+             */
+            Leader=0,
+            /**
+             * @brief 从结点工作模式
+             */
+            Follower=1,
+            /**
+             * @brief 其他模式,如：初始、失联等
+             */
+            Other=2
         };
 
         /**
@@ -48,7 +57,6 @@ namespace xc{
         public:
             IClusterManager(){}
             virtual ~IClusterManager(){}
-
 
             /**
              * @brief 初始化集群资源
@@ -102,6 +110,29 @@ namespace xc{
             virtual EN_NodeMode getMode()=0;
         };
         typedef std::shared_ptr<IClusterManager> IClusterManagerPtr;
+
+        /**
+         * @brief ClusterManager工厂
+         */
+        class ClusterManagerFactory final
+        {
+        public:
+            ClusterManagerFactory()=default;
+            ~ClusterManagerFactory()=default;
+
+            ClusterManagerFactory(const ClusterManagerFactory&)=delete;
+            ClusterManagerFactory(ClusterManagerFactory &&)=delete;
+
+            ClusterManagerFactory & operator=(const ClusterManagerFactory &)=delete;
+            ClusterManagerFactory & operator=(ClusterManagerFactory &&)=delete;
+
+            /**
+             * @brief 创建ClusterManager的实例，并以IClusterManagerPtr的形式返回
+             *
+             * @return IClusterManagerPtr的智能指针
+             */
+            static IClusterManagerPtr create();
+        };
     }
 }
 

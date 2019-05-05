@@ -14,6 +14,7 @@ namespace xc{
     namespace common{
 
         namespace impl{
+
             CClusterManager::CClusterManager():m_runState(EN_State::UnKnown),
             m_nodeMode(EN_NodeMode::Other),m_tag("xunce tech adc"),m_timeout(10)
             {
@@ -30,10 +31,11 @@ namespace xc{
                                             const std::string &node,unsigned int timeout)
             {
                 int res=0;
+                std::lock_guard<std::mutex> lock_guard(m_initMutex);
                 do{
                     if(m_runState==EN_State::Initialized||m_runState==EN_State::Running||
                        m_runState==EN_State::Started)
-                    {//bug is here
+                    {
                         break;
                     }
 
@@ -43,18 +45,18 @@ namespace xc{
                         break;
                     }
 
-                    m_hosts=hosts;
-                    m_path=path;
-                    m_node=node;
-                    m_timeout=timeout;
-
                     zhandle_t *zk_handle=zookeeper_init(hosts.c_str(),CClusterManager::watcher,
-                                                        timeout,(clientid_t*)NULL,(void*)this,0);
+                                                        timeout,(clientid_t*)nullptr,(void*)this,0);
                     if(zk_handle==nullptr)
                     {
                         res=-2;
                         break;
                     }
+
+                    m_hosts=hosts;
+                    m_path=path;
+                    m_node=node;
+                    m_timeout=timeout;
                     this->m_zkhandlePtr.reset();
                     this->m_zkhandlePtr=std::shared_ptr<zhandle_t>(zk_handle,zk_handle_deleter());
                     m_runState=EN_State::Initialized;
@@ -66,12 +68,14 @@ namespace xc{
             int CClusterManager::Start()
             {
                 int res=0;
+                std::lock_guard<std::mutex> lock_guard(m_startMutex);
                 if(m_runState==EN_State::Initialized)
                 {
                     res=this->createNode(this->m_path,this->m_node);
                     if(res==ZOK)
                     {
                         m_runState=EN_State::Started;
+                        m_runState=EN_State::Running;
                     }
                     cout<<getErrorInfo(res)<<endl;
                 }else{
@@ -92,6 +96,7 @@ namespace xc{
             {
                 this->clearEventHandlers();
                 m_zkhandlePtr.reset();
+                m_runState=EN_State::Stopped;
                 return 0;
             }
 
@@ -99,7 +104,13 @@ namespace xc{
             {
                 this->clearEventHandlers();
                 m_zkhandlePtr.reset();
+                m_runState=EN_State::UnKnown;
                 return 0;
+            }
+
+            EN_NodeMode CClusterManager::getMode()
+            {
+                return m_nodeMode;
             }
 
             void CClusterManager::watcher(zhandle_t *zk_handle,int eventType,int state,
@@ -131,7 +142,7 @@ namespace xc{
                 }
                 if(state==ZOO_EXPIRED_SESSION_STATE)
                 {
-                    this->m_runState=EN_State::UnKnown;
+                    //this->m_runState=EN_State::UnKnown;
 
                     do{
                         if(m_nodeMode!=EN_NodeMode::Other)
@@ -143,7 +154,7 @@ namespace xc{
                         this->Initialize(m_hosts,m_path,m_node,m_timeout);
                         this->Start();
                         std::this_thread::sleep_for(std::chrono::seconds(1));
-                    }while(true);
+                    }while(m_runState==EN_State::Running);
                 }
             }
 
@@ -248,6 +259,7 @@ namespace xc{
                     }
                     catch(...)
                     {
+                        cout<<"unhandled exception..."<<endl;
                     }
                 }
             }
@@ -329,6 +341,13 @@ namespace xc{
                  return "UNKNOWN_EVENT_TYPE";
             }
 
+        }
+
+        IClusterManagerPtr ClusterManagerFactory::create()
+        {
+            CClusterManagerPtr cmPtr=std::make_shared<impl::CClusterManager>();
+            IClusterManagerPtr icmPtr=std::dynamic_pointer_cast<IClusterManager>(cmPtr);
+            return icmPtr;
         }
     }
 }
