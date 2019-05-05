@@ -73,7 +73,7 @@ namespace xc{
                     {
                         m_runState=EN_State::Started;
                     }
-                    cout<<errorCode2String(res)<<endl;
+                    cout<<getErrorInfo(res)<<endl;
                 }else{
                     res=-1;
                     cout<<"Need initialize first."<<endl;
@@ -132,7 +132,6 @@ namespace xc{
                 if(state==ZOO_EXPIRED_SESSION_STATE)
                 {
                     this->m_runState=EN_State::UnKnown;
-                    //watcher_fn fn=zoo_set_watcher(zk_handle,&CClusterManager::watcher);
 
                     do{
                         if(m_nodeMode!=EN_NodeMode::Other)
@@ -185,7 +184,7 @@ namespace xc{
                 if((m_zkhandlePtr.get()!=NULL)&&(path.length()>0)&&(node.length()>0))
                 {
                     res=zoo_exists(m_zkhandlePtr.get(),path.c_str(),0,NULL);
-                    cout<<this->errorCode2String(res)<<endl;
+                    cout<<this->getErrorInfo(res)<<endl;
                     std::string zkPath;
                     if (res==ZNONODE)
                     {
@@ -200,7 +199,7 @@ namespace xc{
                             {
                                 res=zoo_create(m_zkhandlePtr.get(),zkPath.c_str(),m_tag.c_str(),m_tag.length(),
                                                 &ZOO_OPEN_ACL_UNSAFE,0,NULL,0);
-                                cout<<"create:"<<zkPath<<":"<<errorCode2String(res)<<endl;
+                                cout<<"create:"<<zkPath<<":"<<getErrorInfo(res)<<endl;
                                 if(res!=ZOK)
                                 {
                                     res=-2;
@@ -220,7 +219,7 @@ namespace xc{
                     {
                         res=zoo_create(m_zkhandlePtr.get(),zkPath.c_str(),m_tag.c_str(),
                                        m_tag.length(),&ZOO_OPEN_ACL_UNSAFE,ZOO_EPHEMERAL,NULL,0);
-                        cout<<"create:"<<zkPath<<":"<<errorCode2String(res)<<endl;
+                        cout<<"create:"<<zkPath<<":"<<getErrorInfo(res)<<endl;
                     }
                 }else{
                     res=-1;
@@ -253,7 +252,7 @@ namespace xc{
                 }
             }
 
-            const char *CClusterManager::errorCode2String(int ec)
+            std::string CClusterManager::getErrorInfo(int ec)
             {
                  if (ec == ZOK) {
                      return "OK";

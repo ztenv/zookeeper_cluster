@@ -90,7 +90,7 @@ namespace xc{
 
                 int createNode(const std::string &path,const std::string &nodeName);
 
-                const char *errorCode2String(int ec);
+                std::string getErrorInfo(int errorCode);
                 static void watcher(zhandle_t *zk_handle,int eventType,int state,
                                        const char *path,void *context);
             };
