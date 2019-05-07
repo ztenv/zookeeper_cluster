@@ -107,7 +107,7 @@ namespace xc{
         /**
          * @brief ClusterManager工厂
          */
-        class ClusterManagerFactory
+        class ClusterManagerFactory final
         {
         public:
             ClusterManagerFactory()=default;
