@@ -102,6 +102,25 @@ namespace xc{
             virtual EN_NodeMode getMode()=0;
         };
         typedef std::shared_ptr<IClusterManager> IClusterManagerPtr;
+
+
+        /**
+         * @brief ClusterManager工厂
+         */
+        class ClusterManagerFactory
+        {
+        public:
+            ClusterManagerFactory()=default;
+            ~ClusterManagerFactory()=default;
+
+            ClusterManagerFactory(const ClusterManagerFactory&)=delete;
+            ClusterManagerFactory(ClusterManagerFactory &&)=delete;
+
+            ClusterManagerFactory & operator=(const ClusterManagerFactory &)=delete;
+            ClusterManagerFactory & operator=(ClusterManagerFactory &&)=delete;
+
+            static IClusterManagerPtr create();
+        };
     }
 }
 

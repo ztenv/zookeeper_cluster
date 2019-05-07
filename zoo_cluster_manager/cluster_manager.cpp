@@ -330,5 +330,12 @@ namespace xc{
             }
 
         }
+
+        IClusterManagerPtr ClusterManagerFactory::create()
+        {
+            CClusterManagerPtr cmPtr=std::make_shared<impl::CClusterManager>();
+            IClusterManagerPtr icmPtr=std::dynamic_pointer_cast<IClusterManager>(cmPtr);
+            return icmPtr;
+        }
     }
 }

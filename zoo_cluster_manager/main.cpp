@@ -31,8 +31,9 @@ int main(int argc,char *argv[])
         path=argv[1];
         node=argv[2];
     }
-    CClusterManagerPtr cmPtr=std::make_shared<impl::CClusterManager>();
-    IClusterManagerPtr icmPtr=cmPtr;
+    //CClusterManagerPtr cmPtr=std::make_shared<impl::CClusterManager>();
+    //IClusterManagerPtr icmPtr=cmPtr;
+    IClusterManagerPtr icmPtr=ClusterManagerFactory::create();
 
     IEventHandlerPtr ehPtr=IEventHandlerPtr(new EventHandler());
 
