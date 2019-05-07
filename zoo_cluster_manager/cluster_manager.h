@@ -63,9 +63,7 @@ namespace xc{
                 int Stop() override;
                 int DeInitialize() override;
 
-                EN_NodeMode getMode()override{
-                    return m_nodeMode;
-                }
+                EN_NodeMode getMode() override;
 
             private:
                 std::atomic<EN_State> m_runState;
@@ -80,6 +78,9 @@ namespace xc{
 
                 std::mutex m_ehMutex;
                 std::vector<common::IEventHandlerPtr> m_eventHandlers;
+
+                std::mutex m_initMutex;
+                std::mutex m_startMutex;
 
                 void clearEventHandlers();
                 void triggerMasterEvent(bool isMaster );
