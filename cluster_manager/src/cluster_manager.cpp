@@ -145,7 +145,6 @@ namespace uvframe{
                 }
                 if(state==ZOO_EXPIRED_SESSION_STATE)
                 {
-                    //this->m_runState=EN_State::UnKnown;
 
                     do{
                         if(m_nodeMode!=EN_NodeMode::Other)
@@ -154,6 +153,7 @@ namespace uvframe{
                             break;
                         }
                         cout<<"reconnecting...["<<m_hosts<<"]:"<<m_node<<endl;
+                        this->m_runState=EN_State::UnKnown;
                         this->Initialize(m_hosts,m_path,m_node,m_timeout);
                         this->Start();
                         std::this_thread::sleep_for(std::chrono::seconds(1));
